@@ -7632,7 +7632,6 @@ async function renderTalkingHeads() {
   var container = document.getElementById('talkingHeadsGrid');
   if (!container) return;
 
-  // Load pillars if not loaded yet
   if (managedPillars.length === 0) await loadPillars();
 
   try {
@@ -7648,7 +7647,6 @@ async function renderTalkingHeads() {
   else if (currentThFilter === 'past') videos = past;
   else videos = talkingHeadsData;
 
-  // Search
   var searchVal = '';
   var searchInput = document.getElementById('thSearchInput');
   if (searchInput) searchVal = searchInput.value.toLowerCase().trim();
@@ -7660,60 +7658,78 @@ async function renderTalkingHeads() {
     });
   }
 
-  // Counts
   var countsEl = document.getElementById('thFilterCounts');
   if (countsEl) {
-    countsEl.innerHTML = '<span>Total: <strong style="color:var(--text);">' + talkingHeadsData.length + '</strong></span>' +
+    countsEl.innerHTML =
+      '<span>Total: <strong style="color:var(--text);">' + talkingHeadsData.length + '</strong></span>' +
       '<span>Upcoming: <strong style="color:#22c55e;">' + upcoming.length + '</strong></span>' +
       '<span>Past: <strong style="color:#94a3b8;">' + past.length + '</strong></span>' +
       (searchVal ? '<span>Showing: <strong style="color:var(--accent);">' + videos.length + '</strong></span>' : '');
   }
 
   if (videos.length === 0) {
-    container.innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:40px;">No talking head videos found. Click "+ Add Video" to create one.</div>';
+    container.innerHTML = '<div style="text-align:center; color:var(--text-dim); padding:60px;">No talking head videos found. Click "+ Add Video" to create one.</div>';
     return;
   }
 
-  container.innerHTML = videos.map(function(v) {
-    var isPast = v.is_past;
-    var pc = getPillarColor(v.pillar);
-    var pColor = { color: pc, bg: pc + '1F' };
+  // Fiverr-style card grid
+  container.innerHTML =
+    '<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:18px;">' +
+    videos.map(function(v) {
+      var isPast = v.is_past;
+      var pc = getPillarColor(v.pillar);
+      var initials = (v.title || 'TH').split(' ').map(function(w){ return w[0]; }).join('').toUpperCase().substring(0, 2);
 
-    return '<div class="card" style="margin-bottom:12px; border:1px solid ' + (isPast ? 'var(--border)' : pColor.color + '44') + '; border-radius:10px; overflow:hidden;' + (isPast ? ' opacity:0.55;' : '') + '">' +
-      '<div style="padding:16px 20px;">' +
-        '<div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-wrap:wrap;">' +
-          // Left side
-          '<div style="flex:1; min-width:240px;">' +
-            '<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px;">' +
-              '<strong style="color:var(--text); font-size:16px;">' + esc(v.title || 'Untitled') + '</strong>' +
-              (isPast ? '<span style="background:#334155; color:#94a3b8; font-size:10px; padding:2px 8px; border-radius:4px; font-weight:600;">PAST</span>' : '<span style="background:#22c55e22; color:#22c55e; font-size:10px; padding:2px 8px; border-radius:4px; font-weight:600;">UPCOMING</span>') +
+      return (
+        '<div style="background:#ffffff; border-radius:12px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.07); border:1px solid #e2e8f0; transition:box-shadow 0.2s, transform 0.2s; cursor:default;" ' +
+          'onmouseover="this.style.boxShadow=\'0 8px 24px rgba(0,0,0,0.13)\'; this.style.transform=\'translateY(-3px)\'" ' +
+          'onmouseout="this.style.boxShadow=\'0 2px 8px rgba(0,0,0,0.07)\'; this.style.transform=\'none\'">' +
+
+          // ── Thumbnail banner ──
+          '<div style="height:110px; background:linear-gradient(135deg, ' + pc + 'cc, ' + pc + '66); display:flex; flex-direction:column; align-items:center; justify-content:center; position:relative; padding:12px;">' +
+            // Past/upcoming badge top-left
+            '<div style="position:absolute; top:10px; left:10px;">' +
+              (isPast
+                ? '<span style="background:rgba(0,0,0,0.35); color:#cbd5e1; font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; letter-spacing:0.5px;">PAST</span>'
+                : '<span style="background:rgba(34,197,94,0.25); color:#22c55e; font-size:10px; font-weight:700; padding:3px 8px; border-radius:20px; letter-spacing:0.5px;">UPCOMING</span>') +
             '</div>' +
-            '<div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px;">' +
-              (v.content_id ? '<span style="background:#334155; color:#94a3b8; font-size:11px; font-weight:600; padding:3px 10px; border-radius:8px; font-family:monospace;">' + esc(v.content_id) + '</span>' : '') +
-              (v.pillar ? '<span style="background:' + pColor.bg + '; color:' + pColor.color + '; font-size:11px; font-weight:600; padding:3px 10px; border-radius:8px;">' + esc(v.pillar) + '</span>' : '') +
+            // Actions top-right
+            '<div style="position:absolute; top:8px; right:8px; display:flex; gap:4px;">' +
+              '<button onclick="openTalkingHeadForm(\'' + v.id + '\')" title="Edit" style="background:rgba(255,255,255,0.2); border:none; color:#fff; width:26px; height:26px; border-radius:6px; cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center;" onmouseover="this.style.background=\'rgba(255,255,255,0.35)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.2)\'">✏️</button>' +
+              '<button onclick="deleteTalkingHead(\'' + v.id + '\')" title="Delete" style="background:rgba(255,255,255,0.2); border:none; color:#fff; width:26px; height:26px; border-radius:6px; cursor:pointer; font-size:13px; display:flex; align-items:center; justify-content:center;" onmouseover="this.style.background=\'rgba(220,38,38,0.5)\'" onmouseout="this.style.background=\'rgba(255,255,255,0.2)\'">🗑</button>' +
             '</div>' +
-            (v.script ? '<div style="font-size:13px; color:var(--text-dim); margin-bottom:6px; max-height:60px; overflow:hidden; text-overflow:ellipsis;"><span style="color:var(--accent); font-weight:600;">Script:</span> ' + esc(v.script).substring(0, 200) + (v.script.length > 200 ? '...' : '') + '</div>' : '') +
-            '<div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:6px;">' +
-              (v.reference_url ? '<a href="' + esc(v.reference_url) + '" target="_blank" style="font-size:12px; color:#4ade80; text-decoration:none; font-weight:600;">🎥 Reference Video ↗</a>' : '') +
-              (v.raw_footage_url ? '<a href="' + esc(v.raw_footage_url) + '" target="_blank" style="font-size:12px; color:#60a5fa; text-decoration:none; font-weight:600;">📂 Raw Footage ↗</a>' : '') +
+            // Big initials
+            '<div style="width:52px; height:52px; border-radius:50%; background:rgba(255,255,255,0.25); display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; color:#fff; letter-spacing:1px; margin-bottom:6px;">' + initials + '</div>' +
+            // Pillar badge
+            (v.pillar ? '<span style="background:rgba(255,255,255,0.2); color:#fff; font-size:10px; font-weight:700; padding:2px 10px; border-radius:20px; letter-spacing:0.5px; text-transform:uppercase;">' + esc(v.pillar) + '</span>' : '') +
+          '</div>' +
+
+          // ── Card body ──
+          '<div style="padding:14px 16px 16px;">' +
+            // Title
+            '<div style="font-size:14px; font-weight:700; color:#1f2937; margin-bottom:6px; line-height:1.4; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="' + esc(v.title || '') + '">' +
+              esc(v.title || 'Untitled') +
+            '</div>' +
+            // Content ID
+            (v.content_id
+              ? '<div style="display:inline-block; background:#f1f5f9; color:#64748b; font-size:11px; font-weight:600; padding:3px 10px; border-radius:6px; font-family:monospace; margin-bottom:10px;">' + esc(v.content_id) + '</div>'
+              : '<div style="margin-bottom:10px;"></div>') +
+            // Footer row: Notion toggle + mark past/upcoming
+            '<div style="display:flex; align-items:center; justify-content:space-between; border-top:1px solid #f1f5f9; padding-top:10px;">' +
+              '<label style="display:flex; align-items:center; gap:5px; font-size:11px; font-weight:600; color:' + (v.sent_to_notion ? '#22c55e' : '#94a3b8') + '; cursor:pointer;">' +
+                '<input type="checkbox" ' + (v.sent_to_notion ? 'checked' : '') + ' onchange="toggleThNotion(\'' + v.id + '\', this.checked)" style="accent-color:#22c55e; cursor:pointer;">' +
+                'Notion' +
+              '</label>' +
+              (!isPast
+                ? '<button onclick="markThPast(\'' + v.id + '\')" style="background:#f1f5f9; color:#64748b; border:none; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;" onmouseover="this.style.background=\'#e2e8f0\'" onmouseout="this.style.background=\'#f1f5f9\'">Mark Past</button>'
+                : '<button onclick="markThUpcoming(\'' + v.id + '\')" style="background:#f0fdf4; color:#22c55e; border:none; padding:4px 10px; border-radius:6px; font-size:11px; font-weight:600; cursor:pointer;" onmouseover="this.style.background=\'#dcfce7\'" onmouseout="this.style.background=\'#f0fdf4\'">Mark Upcoming</button>') +
             '</div>' +
           '</div>' +
-          // Right side — actions
-          '<div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end; min-width:160px;">' +
-            '<div style="display:flex; gap:6px;">' +
-              '<button onclick="openTalkingHeadForm(\'' + v.id + '\')" style="background:transparent; border:1px solid var(--border); color:var(--text-dim); padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:600;">Edit</button>' +
-              '<button onclick="deleteTalkingHead(\'' + v.id + '\')" style="background:transparent; border:1px solid #f87171; color:#f87171; padding:6px 12px; border-radius:6px; font-size:12px; cursor:pointer; font-weight:600;">Delete</button>' +
-            '</div>' +
-            '<label style="display:flex; align-items:center; gap:6px; font-size:12px; color:' + (v.sent_to_notion ? '#22c55e' : 'var(--text-dim)') + '; cursor:pointer; font-weight:600;">' +
-              '<input type="checkbox" ' + (v.sent_to_notion ? 'checked' : '') + ' onchange="toggleThNotion(\'' + v.id + '\', this.checked)">' +
-              'Sent to Notion' +
-            '</label>' +
-            (!isPast ? '<button onclick="markThPast(\'' + v.id + '\')" style="background:#334155; color:#94a3b8; border:none; padding:6px 12px; border-radius:6px; font-size:11px; cursor:pointer; font-weight:600; white-space:nowrap;">Mark as Past</button>' : '<button onclick="markThUpcoming(\'' + v.id + '\')" style="background:#22c55e22; color:#22c55e; border:none; padding:6px 12px; border-radius:6px; font-size:11px; cursor:pointer; font-weight:600; white-space:nowrap;">Mark as Upcoming</button>') +
-          '</div>' +
-        '</div>' +
-      '</div>' +
+
+        '</div>'
+      );
+    }).join('') +
     '</div>';
-  }).join('');
 }
 
 function openTalkingHeadForm(id) {
