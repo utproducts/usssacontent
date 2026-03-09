@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Profile | USSSA All-Access</title>
+<meta name="description" content="USSSA Player of the Week winner profile.">
+<!-- OG tags updated dynamically via JS -->
+<meta property="og:type" content="website">
+<meta property="og:image" id="ogImage" content="">
+<meta property="og:title" id="ogTitle" content="USSSA Player of the Week">
+<meta property="og:description" id="ogDesc" content="">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,400&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #C8102E;
+  --red-dark: #9B0C23;
+  --navy: #002B5C;
+  --navy-dark: #001228;
+  --gold: #F5A623;
+  --white: #fff;
+  --gray: #8a9bb0;
+  --border: rgba(255,255,255,0.09);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Barlow',sans-serif;
+  background:var(--navy-dark); color:var(--white);
+  min-height:100vh; overflow-x:hidden;
+}
+
+/* ── NAV ── */
+.global-nav {
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  background:rgba(0,10,25,0.93); backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(200,16,46,0.25); height:60px;
+}
+.global-nav-inner {
+  max-width:1200px; margin:0 auto; padding:0 32px;
+  height:100%; display:flex; align-items:center; justify-content:space-between;
+}
+.global-nav-logo {
+  text-decoration:none; font-family:'Bebas Neue',sans-serif;
+  font-size:22px; letter-spacing:2px; display:flex; align-items:center; gap:6px;
+}
+.gnav-usssa{color:#fff;} .gnav-aa{color:var(--red);}
+.global-nav-links{display:flex;align-items:center;gap:6px;}
+.gnav-link {
+  font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700;
+  letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.65);
+  text-decoration:none; padding:6px 14px; border-radius:3px; transition:all 0.2s; white-space:nowrap;
+}
+.gnav-link:hover{color:#fff;background:rgba(255,255,255,0.07);}
+.gnav-hof{color:#F5A623!important;}
+.gnav-hof:hover{background:rgba(245,166,35,0.12)!important;}
+.gnav-login{background:var(--red)!important;color:#fff!important;margin-left:8px;}
+.gnav-login:hover{background:#e01230!important;}
+.gnav-hamburger{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:4px 8px;}
+@media(max-width:700px){
+  .gnav-hamburger{display:block;}
+  .global-nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:rgba(0,10,25,0.98);flex-direction:column;padding:12px 0;border-bottom:1px solid rgba(200,16,46,0.3);gap:0;}
+  .global-nav-links.open{display:flex;}
+  .gnav-link{padding:12px 24px;border-radius:0;width:100%;}
+  .gnav-login{margin-left:0;border-radius:0;}
+}
+
+/* ── LOADING / ERROR ── */
+.loading-screen {
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  flex-direction:column; gap:16px;
+}
+.spinner {
+  width:48px; height:48px; border:3px solid rgba(255,255,255,0.1);
+  border-top-color:var(--red); border-radius:50%; animation:spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── HERO SPLIT ── */
+.winner-hero {
+  min-height:100vh;
+  display:grid; grid-template-columns:1fr 1fr;
+  align-items:stretch;
+}
+@media(max-width:768px){ .winner-hero{grid-template-columns:1fr; min-height:auto;} }
+
+.hero-photo-side {
+  position:relative; overflow:hidden;
+  min-height:500px;
+}
+.hero-photo-side img {
+  width:100%; height:100%; object-fit:cover;
+  display:block;
+}
+.hero-photo-overlay {
+  position:absolute; inset:0;
+  background:linear-gradient(to right, transparent 60%, var(--navy-dark) 100%),
+             linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, transparent 40%);
+}
+@media(max-width:768px){
+  .hero-photo-overlay { background:linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, var(--navy-dark) 95%); }
+}
+
+.hero-info-side {
+  display:flex; flex-direction:column; justify-content:center;
+  padding:100px 56px 60px 48px;
+  background:var(--navy-dark);
+  position:relative;
+}
+@media(max-width:1024px){ .hero-info-side{ padding:100px 32px 60px; } }
+@media(max-width:768px){ .hero-info-side{ padding:32px 24px 56px; } }
+
+.back-link {
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:'Barlow Condensed',sans-serif; font-size:13px;
+  font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:rgba(255,255,255,0.4); text-decoration:none;
+  margin-bottom:32px; transition:color 0.2s;
+}
+.back-link:hover{ color:rgba(255,255,255,0.8); }
+
+.winner-sport-badge {
+  display:inline-flex; align-items:center; gap:8px;
+  font-family:'Barlow Condensed',sans-serif; font-size:12px;
+  font-weight:700; letter-spacing:2.5px; text-transform:uppercase;
+  color:#fff; padding:6px 14px; border-radius:2px; margin-bottom:20px;
+}
+.winner-week-tag {
+  font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:3px;
+  color:var(--gold); margin-bottom:16px; display:block;
+}
+.winner-name {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,8vw,88px); line-height:0.92;
+  letter-spacing:2px; margin-bottom:16px;
+}
+.winner-position-team {
+  font-family:'Barlow Condensed',sans-serif; font-size:16px;
+  letter-spacing:1px; text-transform:uppercase;
+  color:rgba(255,255,255,0.5); margin-bottom:28px;
+}
+.criteria-tags { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:32px; }
+.ctag {
+  display:flex; align-items:center; gap:6px;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+  border-radius:3px; padding:7px 12px;
+  font-family:'Barlow Condensed',sans-serif; font-size:13px;
+  font-weight:700; letter-spacing:1px; color:rgba(255,255,255,0.8);
+}
+.winner-bio-short {
+  font-size:17px; color:rgba(255,255,255,0.65);
+  line-height:1.75; margin-bottom:36px;
+  max-width:520px; font-style:italic;
+  border-left:3px solid var(--red); padding-left:16px;
+}
+.action-btns { display:flex; gap:12px; flex-wrap:wrap; }
+.btn-post {
+  display:inline-flex; align-items:center; gap:8px;
+  background:var(--red); color:#fff; text-decoration:none;
+  font-family:'Bebas Neue',sans-serif; font-size:18px; letter-spacing:2px;
+  padding:14px 28px; border-radius:3px; transition:all 0.2s;
+  box-shadow:0 8px 32px rgba(200,16,46,0.35);
+}
+.btn-post:hover{ background:#e01230; transform:translateY(-2px); box-shadow:0 12px 48px rgba(200,16,46,0.55); }
+.btn-share {
+  display:inline-flex; align-items:center; gap:8px;
+  background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.2);
+  color:#fff; font-family:'Bebas Neue',sans-serif; font-size:18px;
+  letter-spacing:2px; padding:14px 24px; border-radius:3px;
+  cursor:pointer; transition:all 0.2s;
+}
+.btn-share:hover{ background:rgba(255,255,255,0.12); }
+
+/* ── FULL STORY ── */
+.story-section {
+  max-width:800px; margin:0 auto; padding:80px 24px;
+}
+.story-label {
+  font-family:'Bebas Neue',sans-serif; font-size:12px;
+  letter-spacing:4px; color:var(--red); margin-bottom:12px;
+}
+.story-title {
+  font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,5vw,56px);
+  letter-spacing:1px; margin-bottom:32px; line-height:1;
+}
+.story-body {
+  font-size:17px; line-height:1.85; color:rgba(255,255,255,0.7);
+  max-width:680px;
+}
+.story-body p { margin-bottom:20px; }
+
+/* ── NOMINATED BY ── */
+.nominated-by {
+  background:rgba(255,255,255,0.03); border:1px solid var(--border);
+  border-radius:6px; padding:24px 28px;
+  display:flex; align-items:center; gap:16px; margin-top:48px;
+}
+.nom-icon {
+  width:48px; height:48px; background:var(--red); border-radius:50%;
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+  flex-shrink:0;
+}
+.nom-label {
+  font-family:'Barlow Condensed',sans-serif; font-size:11px;
+  font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:var(--gray); margin-bottom:4px;
+}
+.nom-name { font-family:'Bebas Neue',sans-serif; font-size:22px; letter-spacing:1px; }
+.nom-rel { font-size:13px; color:var(--gray); }
+
+/* ── DIVIDER ── */
+.divider {
+  height:1px; margin:0 24px;
+  background:linear-gradient(90deg,transparent,rgba(200,16,46,0.4),rgba(255,255,255,0.1),rgba(200,16,46,0.4),transparent);
+}
+
+/* ── SHARE BAND ── */
+.share-band {
+  background:rgba(255,255,255,0.02); border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border); padding:48px 24px; text-align:center;
+}
+.share-band h3 {
+  font-family:'Bebas Neue',sans-serif; font-size:32px; letter-spacing:2px; margin-bottom:8px;
+}
+.share-band p { color:var(--gray); font-size:15px; margin-bottom:28px; }
+.share-buttons { display:flex; justify-content:center; gap:12px; flex-wrap:wrap; }
+.share-btn {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:12px 24px; border-radius:3px; cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif; font-size:14px;
+  font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  text-decoration:none; border:none; transition:all 0.2s;
+}
+.share-btn:hover{ transform:translateY(-2px); }
+.share-copy{ background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2); }
+.share-copy:hover{ background:rgba(255,255,255,0.15); }
+.share-twitter{ background:#1DA1F2; color:#fff; }
+.share-facebook{ background:#1877F2; color:#fff; }
+
+/* ── NEXT/PREV NAV ── */
+.winner-nav {
+  max-width:1100px; margin:0 auto; padding:48px 24px;
+  display:grid; grid-template-columns:1fr 1fr; gap:20px;
+}
+@media(max-width:600px){ .winner-nav{grid-template-columns:1fr;} }
+
+.wnav-card {
+  background:var(--card-bg, rgba(255,255,255,0.03));
+  border:1px solid var(--border); border-radius:8px;
+  padding:20px; text-decoration:none; color:inherit;
+  display:flex; align-items:center; gap:16px; transition:all 0.2s;
+}
+.wnav-card:hover{ border-color:rgba(200,16,46,0.35); transform:translateY(-3px); }
+.wnav-card.next{ flex-direction:row-reverse; text-align:right; }
+.wnav-img{ width:60px; height:60px; border-radius:4px; object-fit:cover; flex-shrink:0; }
+.wnav-dir{ font-family:'Barlow Condensed',sans-serif; font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--gray); margin-bottom:4px; }
+.wnav-name{ font-family:'Bebas Neue',sans-serif; font-size:20px; letter-spacing:1px; }
+.wnav-meta{ font-size:12px; color:var(--gray); }
+
+/* ── CTA ── */
+.cta-band {
+  background:linear-gradient(135deg,var(--red-dark),var(--red));
+  padding:64px 24px; text-align:center;
+}
+.cta-band h2{ font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,6vw,56px); letter-spacing:2px; margin-bottom:10px; }
+.cta-band p{ font-size:16px; color:rgba(255,255,255,0.8); margin-bottom:28px; }
+.cta-band a{
+  display:inline-block; background:#fff; color:var(--red);
+  text-decoration:none; font-family:'Bebas Neue',sans-serif;
+  font-size:20px; letter-spacing:3px; padding:16px 44px; border-radius:3px; transition:all 0.2s;
+}
+.cta-band a:hover{ transform:translateY(-2px); box-shadow:0 12px 40px rgba(0,0,0,0.3); }
+
+/* ── FOOTER ── */
+footer{ background:rgba(0,0,0,0.4); border-top:1px solid var(--border); padding:36px 24px; text-align:center; }
+.footer-logo{ font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:3px; margin-bottom:6px; }
+.footer-logo span{ color:var(--red); }
+footer p{ font-size:13px; color:var(--gray); }
+
+/* ── NOT FOUND ── */
+.not-found {
+  min-height:80vh; display:flex; align-items:center; justify-content:center;
+  flex-direction:column; text-align:center; padding:40px;
+}
+.not-found h1{ font-family:'Bebas Neue',sans-serif; font-size:80px; color:var(--red); }
+.not-found p{ color:var(--gray); font-size:17px; margin:12px 0 28px; }
+.not-found a{ color:var(--red); text-decoration:none; font-weight:600; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="global-nav">
+  <div class="global-nav-inner">
+    <a class="global-nav-logo" href="index.html">
+      <span class="gnav-usssa">USSSA</span><span class="gnav-aa">&nbsp;All-Access</span>
+    </a>
+    <div class="global-nav-links" id="gnavLinks">
+      <a href="index.html" class="gnav-link">Home</a>
+      <a href="player-of-the-week.html" class="gnav-link">Player of the Week</a>
+      <a href="hall-of-fame.html" class="gnav-link gnav-hof">🏆 Hall of Fame</a>
+      <a href="field-reporter.html" class="gnav-link">Field Reporter</a>
+      <a href="index.html" class="gnav-link gnav-login">Staff Login</a>
+    </div>
+    <button class="gnav-hamburger" onclick="document.getElementById('gnavLinks').classList.toggle('open')">☰</button>
+  </div>
+</div>
+
+<!-- DYNAMIC CONTENT -->
+<div id="pageContent">
+  <div class="loading-screen" style="padding-top:60px;">
+    <div class="spinner"></div>
+    <p style="color:var(--gray); font-family:'Barlow Condensed',sans-serif; letter-spacing:2px; font-size:13px; text-transform:uppercase;">Loading Profile...</p>
+  </div>
+</div>
+
+<script src="winners-data.js"></script>
+<script>
+const SPORT_COLORS = {
+  baseball:  '#1565C0',
+  fastpitch: '#6A1B9A',
+  slowpitch: '#2E7D32'
+};
+
+function copyToClipboard(text) {
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.share-copy');
+    if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = '🔗 Copy Link', 2000); }
+  });
+}
+
+function renderWinner(w) {
+  const sport = SPORT_CONFIG[w.sport];
+  const color = SPORT_COLORS[w.sport];
+  const pageUrl = window.location.href;
+
+  // Update page title and OG tags
+  document.title = `${w.name} — USSSA Player of the Week | Hall of Fame`;
+  document.getElementById('ogTitle').content = `${w.name} — USSSA Player of the Week`;
+  document.getElementById('ogDesc').content = w.shortBio;
+  document.getElementById('ogImage').content = w.photo;
+
+  const criteriaHtml = w.criteria.map(c => {
+    const cl = CRITERIA_LABELS[c];
+    return `<div class="ctag">${cl.emoji} ${cl.label}</div>`;
+  }).join('');
+
+  // Prev / Next winners
+  const allSameSport = WINNERS.filter(x => x.sport === w.sport);
+  const idx = allSameSport.findIndex(x => x.id === w.id);
+  const prev = allSameSport[idx + 1] || null;
+  const next = allSameSport[idx - 1] || null;
+
+  const prevHtml = prev ? `
+    <a class="wnav-card" href="winner.html?id=${prev.id}">
+      <img class="wnav-img" src="${prev.photo}" alt="${prev.name}">
+      <div>
+        <div class="wnav-dir">← Previous Winner</div>
+        <div class="wnav-name">${prev.name}</div>
+        <div class="wnav-meta">${prev.weekLabel} · ${SPORT_CONFIG[prev.sport].label}</div>
+      </div>
+    </a>` : '<div></div>';
+
+  const nextHtml = next ? `
+    <a class="wnav-card next" href="winner.html?id=${next.id}">
+      <img class="wnav-img" src="${next.photo}" alt="${next.name}">
+      <div>
+        <div class="wnav-dir">Next Winner →</div>
+        <div class="wnav-name">${next.name}</div>
+        <div class="wnav-meta">${next.weekLabel} · ${SPORT_CONFIG[next.sport].label}</div>
+      </div>
+    </a>` : '<div></div>';
+
+  const postBtnHtml = w.postUrl ? `<a class="btn-post" href="${w.postUrl}" target="_blank" rel="noopener">📲 View Original Post</a>` : '';
+
+  document.getElementById('pageContent').innerHTML = `
+    <!-- HERO SPLIT -->
+    <section class="winner-hero" style="padding-top:60px;">
+      <div class="hero-photo-side">
+        <img src="${w.photo}" alt="${w.name}">
+        <div class="hero-photo-overlay"></div>
+      </div>
+      <div class="hero-info-side">
+        <a class="back-link" href="hall-of-fame.html">← Back to Hall of Fame</a>
+        <div class="winner-sport-badge" style="background:${color}">${sport.emoji} ${sport.label}</div>
+        <span class="winner-week-tag">${w.weekLabel}</span>
+        <h1 class="winner-name">${w.name}</h1>
+        <p class="winner-position-team">${w.position} · ${w.team} · ${w.state}${w.age ? ' · Age ' + w.age : ''}</p>
+        <div class="criteria-tags">${criteriaHtml}</div>
+        <p class="winner-bio-short">"${w.shortBio}"</p>
+        <div class="action-btns">
+          ${postBtnHtml}
+          <button class="btn-share" onclick="copyToClipboard('${pageUrl}')">🔗 Share Profile</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- FULL STORY -->
+    <section class="story-section">
+      <p class="story-label">Full Story</p>
+      <h2 class="story-title">Why ${w.name.split(' ')[0]} Won</h2>
+      <div class="story-body">
+        ${w.fullBio.split('\n').map(p => `<p>${p}</p>`).join('')}
+      </div>
+      <div class="nominated-by">
+        <div class="nom-icon">🏅</div>
+        <div>
+          <div class="nom-label">Nominated By</div>
+          <div class="nom-name">${w.nominatedBy}</div>
+          <div class="nom-rel">${w.relationship}</div>
+        </div>
+      </div>
+    </section>
+
+    <div class="divider"></div>
+
+    <!-- SHARE -->
+    <div class="share-band">
+      <h3>Share ${w.name.split(' ')[0]}'s Story</h3>
+      <p>Help spread the word — every share helps recognize what this player has accomplished.</p>
+      <div class="share-buttons">
+        <button class="share-btn share-copy" onclick="copyToClipboard('${pageUrl}')">🔗 Copy Link</button>
+        <a class="share-btn share-twitter" href="https://twitter.com/intent/tweet?text=${encodeURIComponent('Congrats to ' + w.name + ' — USSSA Player of the Week ' + w.weekLabel + '! ' + w.shortBio)}&url=${encodeURIComponent(pageUrl)}" target="_blank">𝕏 Share on X</a>
+        <a class="share-btn share-facebook" href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}" target="_blank">f Share</a>
+      </div>
+    </div>
+
+    <!-- PREV / NEXT -->
+    <div class="winner-nav">
+      ${prevHtml}
+      ${nextHtml}
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- CTA -->
+    <div class="cta-band">
+      <h2>Know Someone Like ${w.name.split(' ')[0]}?</h2>
+      <p>Nominations are open every week. Anyone can nominate — coaches, parents, or teammates.</p>
+      <a href="player-of-the-week.html#nominate">Nominate a Player →</a>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+      <div class="footer-logo">USSSA <span>All-Access</span></div>
+      <p>© 2025 USSSA. Empowering youth athletes nationwide.</p>
+    </footer>
+  `;
+}
+
+function renderNotFound(id) {
+  document.getElementById('pageContent').innerHTML = `
+    <div class="not-found" style="padding-top:80px;">
+      <h1>404</h1>
+      <p>We couldn't find a winner with that ID.<br>They may have been removed or the link may be incorrect.</p>
+      <a href="hall-of-fame.html">← Back to Hall of Fame</a>
+    </div>
+  `;
+}
+
+// Read ?id= from URL and render
+const params = new URLSearchParams(window.location.search);
+const id = params.get('id');
+if (id) {
+  const winner = getWinnerById(id);
+  if (winner) { renderWinner(winner); }
+  else { renderNotFound(id); }
+} else {
+  // No ID — redirect to hall of fame
+  window.location.href = 'hall-of-fame.html';
+}
+</script>
+</body>
+</html>

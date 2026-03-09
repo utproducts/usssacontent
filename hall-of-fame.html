@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player of the Week — Hall of Fame | USSSA All-Access</title>
+<meta name="description" content="The USSSA Player of the Week Hall of Fame — honoring baseball, fastpitch, and slowpitch athletes who go beyond the box score.">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;1,400&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #C8102E;
+  --red-dark: #9B0C23;
+  --navy: #002B5C;
+  --navy-dark: #001228;
+  --gold: #F5A623;
+  --white: #fff;
+  --gray: #8a9bb0;
+  --border: rgba(255,255,255,0.09);
+  --card-bg: rgba(255,255,255,0.035);
+  --baseball: #002B5C;
+  --fastpitch: #6A1B9A;
+  --slowpitch: #1B5E20;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Barlow',sans-serif;
+  background: var(--navy-dark);
+  color: var(--white);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── NAV (shared) ── */
+.global-nav {
+  position:fixed; top:0; left:0; right:0; z-index:1000;
+  background:rgba(0,10,25,0.93);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(200,16,46,0.25);
+  height:60px;
+}
+.global-nav-inner {
+  max-width:1200px; margin:0 auto; padding:0 32px;
+  height:100%; display:flex; align-items:center; justify-content:space-between;
+}
+.global-nav-logo {
+  text-decoration:none;
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px; letter-spacing:2px;
+  display:flex; align-items:center; gap:6px;
+}
+.gnav-usssa { color:#fff; }
+.gnav-aa { color:var(--red); }
+.global-nav-links { display:flex; align-items:center; gap:6px; }
+.gnav-link {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:13px; font-weight:700; letter-spacing:1.5px;
+  text-transform:uppercase; color:rgba(255,255,255,0.65);
+  text-decoration:none; padding:6px 14px; border-radius:3px;
+  transition:all 0.2s; white-space:nowrap;
+}
+.gnav-link:hover { color:#fff; background:rgba(255,255,255,0.07); }
+.gnav-link.gnav-active { color:#fff; background:rgba(255,255,255,0.05); }
+.gnav-hof { color:#F5A623 !important; }
+.gnav-hof:hover { background:rgba(245,166,35,0.12) !important; }
+.gnav-login { background:var(--red)!important; color:#fff!important; margin-left:8px; }
+.gnav-login:hover { background:#e01230!important; }
+.gnav-hamburger { display:none; background:none; border:none; color:#fff; font-size:22px; cursor:pointer; padding:4px 8px; }
+@media(max-width:700px){
+  .gnav-hamburger{display:block;}
+  .global-nav-links{display:none;position:absolute;top:60px;left:0;right:0;background:rgba(0,10,25,0.98);flex-direction:column;padding:12px 0;border-bottom:1px solid rgba(200,16,46,0.3);gap:0;}
+  .global-nav-links.open{display:flex;}
+  .gnav-link{padding:12px 24px;border-radius:0;width:100%;}
+  .gnav-login{margin-left:0;border-radius:0;}
+}
+
+/* ── PAGE HERO ── */
+.hof-hero {
+  padding: 120px 24px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hof-hero-bg {
+  position:absolute; inset:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 0%, rgba(200,16,46,0.2) 0%, transparent 70%),
+    linear-gradient(180deg, #001228 0%, #001a38 100%);
+}
+.hof-hero-grid {
+  position:absolute; inset:0;
+  background-image: linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px);
+  background-size:60px 60px;
+}
+.hof-hero-content { position:relative; }
+.hof-eyebrow {
+  display:inline-flex; align-items:center; gap:10px;
+  background:rgba(245,166,35,0.12); border:1px solid rgba(245,166,35,0.35);
+  border-radius:2px; padding:7px 18px; margin-bottom:24px;
+  font-family:'Barlow Condensed',sans-serif; font-size:12px; font-weight:700;
+  letter-spacing:3px; text-transform:uppercase; color:var(--gold);
+}
+.hof-title {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,10vw,110px);
+  line-height:0.92; letter-spacing:3px; margin-bottom:20px;
+}
+.hof-title .t1 { color:#fff; display:block; }
+.hof-title .t2 { color:var(--red); display:block; }
+.hof-title .t3 { color:rgba(255,255,255,0.25); display:block; font-size:0.45em; letter-spacing:10px; }
+.hof-subtitle {
+  font-family:'Barlow Condensed',sans-serif; font-style:italic;
+  font-size:18px; color:rgba(255,255,255,0.55); max-width:520px;
+  margin:0 auto 16px; line-height:1.6;
+}
+.hof-count {
+  font-family:'Bebas Neue',sans-serif; font-size:14px; letter-spacing:3px;
+  color:var(--gold); opacity:0.8;
+}
+
+/* ── SPORT TABS ── */
+.tabs-wrap {
+  position:sticky; top:60px; z-index:100;
+  background:rgba(0,12,28,0.96);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.tabs-inner {
+  max-width:1200px; margin:0 auto; padding:0 24px;
+  display:flex; gap:0; overflow-x:auto;
+  scrollbar-width:none;
+}
+.tabs-inner::-webkit-scrollbar { display:none; }
+.sport-tab {
+  display:flex; align-items:center; gap:10px;
+  padding:18px 28px; cursor:pointer;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:14px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:rgba(255,255,255,0.45);
+  border-bottom:3px solid transparent;
+  transition:all 0.2s; white-space:nowrap; background:none; border-top:none;
+  border-left:none; border-right:none;
+}
+.sport-tab:hover { color:rgba(255,255,255,0.8); }
+.sport-tab.active { color:#fff; border-bottom-color:var(--red); }
+.sport-tab.active[data-sport="baseball"] { border-bottom-color:#4a9eda; }
+.sport-tab.active[data-sport="fastpitch"] { border-bottom-color:#ce93d8; }
+.sport-tab.active[data-sport="slowpitch"] { border-bottom-color:#81c784; }
+.tab-emoji { font-size:18px; }
+.tab-count {
+  background:rgba(255,255,255,0.08); border-radius:20px;
+  font-size:11px; padding:2px 8px; color:rgba(255,255,255,0.5);
+}
+
+/* ── GRID CONTAINER ── */
+.grid-section {
+  max-width:1200px; margin:0 auto;
+  padding:48px 24px 80px;
+}
+.grid-header {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:32px; flex-wrap:wrap; gap:12px;
+}
+.grid-heading {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:32px; letter-spacing:2px;
+}
+.grid-sort {
+  display:flex; align-items:center; gap:10px;
+  font-family:'Barlow Condensed',sans-serif; font-size:13px;
+  color:var(--gray);
+}
+.grid-sort select {
+  background:rgba(255,255,255,0.06); border:1px solid var(--border);
+  color:#fff; padding:6px 12px; border-radius:3px;
+  font-family:'Barlow Condensed',sans-serif; font-size:13px; cursor:pointer;
+  outline:none;
+}
+.grid-sort select option { background:#001228; }
+
+/* ── WINNER CARDS (Fiverr-style) ── */
+.winners-grid {
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(260px, 1fr));
+  gap:20px;
+}
+.winner-card {
+  background:var(--card-bg);
+  border:1px solid var(--border);
+  border-radius:10px; overflow:hidden;
+  cursor:pointer; transition:all 0.25s;
+  text-decoration:none; color:inherit;
+  display:flex; flex-direction:column;
+}
+.winner-card:hover {
+  transform:translateY(-6px);
+  border-color:rgba(200,16,46,0.4);
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+}
+.wcard-img-wrap {
+  position:relative; overflow:hidden;
+  height:220px; background:#0a1628;
+}
+.wcard-img-wrap img {
+  width:100%; height:100%; object-fit:cover;
+  transition:transform 0.4s ease;
+}
+.winner-card:hover .wcard-img-wrap img { transform:scale(1.06); }
+
+.wcard-sport-badge {
+  position:absolute; top:12px; left:12px;
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:11px; font-weight:700; letter-spacing:2px; text-transform:uppercase;
+  color:#fff; padding:4px 10px; border-radius:2px;
+}
+.wcard-week-badge {
+  position:absolute; top:12px; right:12px;
+  background:rgba(0,0,0,0.65);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:13px; letter-spacing:1.5px;
+  color:rgba(255,255,255,0.85); padding:4px 10px; border-radius:2px;
+}
+.wcard-criteria-strip {
+  position:absolute; bottom:0; left:0; right:0;
+  background:linear-gradient(transparent, rgba(0,0,0,0.8));
+  padding:24px 12px 10px;
+  display:flex; gap:6px; flex-wrap:wrap;
+}
+.wcard-crit {
+  background:rgba(0,0,0,0.5);
+  border:1px solid rgba(255,255,255,0.15);
+  font-size:10px; font-family:'Barlow Condensed',sans-serif;
+  font-weight:700; letter-spacing:0.5px;
+  padding:2px 7px; border-radius:2px; color:rgba(255,255,255,0.8);
+}
+
+.wcard-body { padding:16px 18px 20px; flex:1; display:flex; flex-direction:column; gap:8px; }
+.wcard-name {
+  font-family:'Bebas Neue',sans-serif;
+  font-size:22px; letter-spacing:1px; line-height:1;
+}
+.wcard-meta {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:12px; letter-spacing:0.5px;
+  color:var(--gray); text-transform:uppercase;
+}
+.wcard-bio {
+  font-size:13px; color:rgba(255,255,255,0.6);
+  line-height:1.6; flex:1;
+  display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
+}
+.wcard-footer {
+  display:flex; align-items:center; justify-content:space-between;
+  padding-top:12px; border-top:1px solid var(--border); margin-top:auto;
+}
+.wcard-view {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:12px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--red);
+}
+.wcard-arrow { color:var(--red); font-size:16px; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align:center; padding:80px 24px;
+  font-family:'Barlow Condensed',sans-serif;
+}
+.empty-state .big-emoji { font-size:64px; display:block; margin-bottom:20px; opacity:0.4; }
+.empty-state h3 { font-family:'Bebas Neue',sans-serif; font-size:32px; margin-bottom:10px; color:rgba(255,255,255,0.4); }
+.empty-state p { color:var(--gray); font-size:15px; }
+
+/* ── CTA BAND ── */
+.cta-band {
+  background:linear-gradient(135deg, var(--red-dark), var(--red));
+  padding:64px 24px; text-align:center;
+}
+.cta-band h2 { font-family:'Bebas Neue',sans-serif; font-size:clamp(36px,6vw,60px); letter-spacing:2px; margin-bottom:12px; }
+.cta-band p { font-size:17px; color:rgba(255,255,255,0.8); margin-bottom:32px; }
+.cta-band a {
+  display:inline-block; background:#fff; color:var(--red);
+  text-decoration:none; font-family:'Bebas Neue',sans-serif;
+  font-size:20px; letter-spacing:3px; padding:16px 44px; border-radius:3px;
+  transition:all 0.2s; box-shadow:0 8px 32px rgba(0,0,0,0.3);
+}
+.cta-band a:hover { transform:translateY(-2px); box-shadow:0 12px 48px rgba(0,0,0,0.4); }
+
+/* ── FOOTER ── */
+footer {
+  background:rgba(0,0,0,0.4); border-top:1px solid var(--border);
+  padding:36px 24px; text-align:center;
+}
+.footer-logo { font-family:'Bebas Neue',sans-serif; font-size:24px; letter-spacing:3px; margin-bottom:6px; }
+.footer-logo span { color:var(--red); }
+footer p { font-size:13px; color:var(--gray); }
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(20px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.winner-card { animation:fadeUp 0.4s ease both; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="global-nav">
+  <div class="global-nav-inner">
+    <a class="global-nav-logo" href="index.html">
+      <span class="gnav-usssa">USSSA</span><span class="gnav-aa">&nbsp;All-Access</span>
+    </a>
+    <div class="global-nav-links" id="gnavLinks">
+      <a href="index.html" class="gnav-link">Home</a>
+      <a href="player-of-the-week.html" class="gnav-link">Player of the Week</a>
+      <a href="hall-of-fame.html" class="gnav-link gnav-active gnav-hof">🏆 Hall of Fame</a>
+      <a href="field-reporter.html" class="gnav-link">Field Reporter</a>
+      <a href="index.html" class="gnav-link gnav-login">Staff Login</a>
+    </div>
+    <button class="gnav-hamburger" onclick="document.getElementById('gnavLinks').classList.toggle('open')">☰</button>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hof-hero">
+  <div class="hof-hero-bg"></div>
+  <div class="hof-hero-grid"></div>
+  <div class="hof-hero-content">
+    <div class="hof-eyebrow">★ USSSA All-Access ★</div>
+    <h1 class="hof-title">
+      <span class="t3">Player of the Week</span>
+      <span class="t1">Hall of</span>
+      <span class="t2">Fame</span>
+    </h1>
+    <p class="hof-subtitle">Every honoree here went beyond the box score. Role models, community leaders, extraordinary teammates — these are the athletes USSSA is proud to call its own.</p>
+    <div class="hof-count" id="totalCount"></div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs-inner">
+    <button class="sport-tab active" data-sport="all" onclick="filterSport('all', this)">
+      <span class="tab-emoji">🏅</span> All Sports <span class="tab-count" id="count-all"></span>
+    </button>
+    <button class="sport-tab" data-sport="baseball" onclick="filterSport('baseball', this)">
+      <span class="tab-emoji">⚾</span> Baseball <span class="tab-count" id="count-baseball"></span>
+    </button>
+    <button class="sport-tab" data-sport="fastpitch" onclick="filterSport('fastpitch', this)">
+      <span class="tab-emoji">🥎</span> Fastpitch <span class="tab-count" id="count-fastpitch"></span>
+    </button>
+    <button class="sport-tab" data-sport="slowpitch" onclick="filterSport('slowpitch', this)">
+      <span class="tab-emoji">🏌️</span> Slowpitch <span class="tab-count" id="count-slowpitch"></span>
+    </button>
+  </div>
+</div>
+
+<!-- GRID -->
+<section class="grid-section">
+  <div class="grid-header">
+    <h2 class="grid-heading" id="gridHeading">All Honorees</h2>
+    <div class="grid-sort">
+      <span>Sort by:</span>
+      <select id="sortSelect" onchange="renderGrid()">
+        <option value="newest">Newest First</option>
+        <option value="oldest">Oldest First</option>
+        <option value="name">Name A–Z</option>
+      </select>
+    </div>
+  </div>
+  <div class="winners-grid" id="winnersGrid"></div>
+</section>
+
+<!-- CTA -->
+<div class="cta-band">
+  <h2>Know a Player Who Deserves This?</h2>
+  <p>Nominations are reviewed every Monday. Anyone can nominate — coaches, parents, or teammates.</p>
+  <a href="player-of-the-week.html#nominate">Nominate a Player →</a>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">USSSA <span>All-Access</span></div>
+  <p>© 2025 USSSA. Empowering youth athletes nationwide.</p>
+</footer>
+
+<script src="winners-data.js"></script>
+<script>
+let currentSport = 'all';
+
+const SPORT_COLORS = {
+  baseball:  '#1565C0',
+  fastpitch: '#6A1B9A',
+  slowpitch: '#2E7D32'
+};
+
+function initCounts() {
+  document.getElementById('count-all').textContent = WINNERS.length;
+  document.getElementById('count-baseball').textContent = WINNERS.filter(w=>w.sport==='baseball').length;
+  document.getElementById('count-fastpitch').textContent = WINNERS.filter(w=>w.sport==='fastpitch').length;
+  document.getElementById('count-slowpitch').textContent = WINNERS.filter(w=>w.sport==='slowpitch').length;
+  document.getElementById('totalCount').textContent = `${WINNERS.length} Athletes Honored`;
+}
+
+function filterSport(sport, btn) {
+  currentSport = sport;
+  document.querySelectorAll('.sport-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const headings = { all:'All Honorees', baseball:'Baseball Honorees', fastpitch:'Fastpitch Honorees', slowpitch:'Slowpitch Honorees' };
+  document.getElementById('gridHeading').textContent = headings[sport];
+  renderGrid();
+}
+
+function getSorted(list) {
+  const sort = document.getElementById('sortSelect').value;
+  const arr = [...list];
+  if (sort === 'newest') return arr.sort((a,b) => (b.year*100+b.week)-(a.year*100+a.week));
+  if (sort === 'oldest') return arr.sort((a,b) => (a.year*100+a.week)-(b.year*100+b.week));
+  if (sort === 'name')   return arr.sort((a,b) => a.name.localeCompare(b.name));
+  return arr;
+}
+
+function renderGrid() {
+  const grid = document.getElementById('winnersGrid');
+  const filtered = currentSport === 'all' ? WINNERS : WINNERS.filter(w => w.sport === currentSport);
+  const sorted = getSorted(filtered);
+
+  if (sorted.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1">
+      <span class="big-emoji">🏅</span>
+      <h3>No Honorees Yet</h3>
+      <p>Check back soon — nominations are reviewed weekly.</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = sorted.map((w, i) => {
+    const sport = SPORT_CONFIG[w.sport];
+    const criteriaHtml = w.criteria.map(c => {
+      const cl = CRITERIA_LABELS[c];
+      return `<span class="wcard-crit">${cl.emoji} ${cl.label}</span>`;
+    }).join('');
+
+    return `<a class="winner-card" href="winner.html?id=${encodeURIComponent(w.id)}" style="animation-delay:${i*0.05}s">
+      <div class="wcard-img-wrap">
+        <img src="${w.photo}" alt="${w.name}" loading="lazy">
+        <div class="wcard-sport-badge" style="background:${SPORT_COLORS[w.sport]}">${sport.emoji} ${sport.label}</div>
+        <div class="wcard-week-badge">${w.weekLabel}</div>
+        <div class="wcard-criteria-strip">${criteriaHtml}</div>
+      </div>
+      <div class="wcard-body">
+        <div class="wcard-name">${w.name}</div>
+        <div class="wcard-meta">${w.position} · ${w.team} · ${w.state}</div>
+        <p class="wcard-bio">${w.shortBio}</p>
+        <div class="wcard-footer">
+          <span class="wcard-view">View Profile</span>
+          <span class="wcard-arrow">→</span>
+        </div>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+// Init
+initCounts();
+renderGrid();
+</script>
+</body>
+</html>
