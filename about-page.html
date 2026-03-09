@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About — USSSA All-Access</title>
+  <style>
+    :root {
+      --navy: #0a1628;
+      --navy2: #111d32;
+      --navy3: #1a2744;
+      --red: #CE2129;
+      --red-dark: #a81b22;
+      --white: #ffffff;
+      --light: #f1f3f8;
+      --gray: #e2e8f0;
+      --text: #1f2937;
+      --text-light: #64748b;
+      --border: #e2e8f0;
+      --radius: 12px;
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--light);
+      color: var(--text);
+      padding-top: 60px;
+    }
+
+    /* NAV */
+    .global-nav { position:fixed; top:0; left:0; right:0; z-index:9999; background:rgba(0,10,25,0.95); backdrop-filter:blur(12px); border-bottom:1px solid rgba(200,16,46,0.25); height:60px; }
+    .global-nav-inner { max-width:1300px; margin:0 auto; padding:0 32px; height:100%; display:flex; align-items:center; justify-content:space-between; }
+    .global-nav-logo { text-decoration:none; font-size:18px; font-weight:800; letter-spacing:1px; display:flex; align-items:center; gap:5px; }
+    .gnav-usssa { color:#ffffff; }
+    .gnav-aa { color:#CE2129; }
+    .global-nav-links { display:flex; align-items:center; gap:4px; }
+    .gnav-link { font-size:13px; font-weight:600; letter-spacing:1px; text-transform:uppercase; color:rgba(255,255,255,0.65); text-decoration:none; padding:6px 14px; border-radius:6px; transition:all 0.2s; white-space:nowrap; }
+    .gnav-link:hover { color:#ffffff; background:rgba(255,255,255,0.08); }
+    .gnav-link.gnav-active { color:#ffffff; background:rgba(255,255,255,0.05); }
+    .gnav-login { background:#CE2129 !important; color:white !important; margin-left:8px; border-radius:6px; }
+    .gnav-login:hover { background:#a81b22 !important; }
+    .gnav-hof { color:#F5A623 !important; }
+    .gnav-hof:hover { background:rgba(245,166,35,0.12) !important; }
+    .gnav-hamburger { display:none; background:none; border:none; color:white; font-size:22px; cursor:pointer; padding:4px 8px; }
+    @media (max-width:700px) {
+      .gnav-hamburger { display:block; }
+      .global-nav-links { display:none; position:absolute; top:60px; left:0; right:0; background:rgba(0,10,25,0.98); flex-direction:column; padding:12px 0; border-bottom:1px solid rgba(206,33,41,0.3); gap:0; }
+      .global-nav-links.open { display:flex; }
+      .gnav-link { padding:12px 24px; border-radius:0; width:100%; }
+      .gnav-login { margin-left:0; border-radius:0; }
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy3) 100%);
+      padding: 64px 24px 56px;
+      text-align: center;
+      color: white;
+    }
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 12px;
+    }
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--red); }
+    .hero p {
+      font-size: 1.1rem;
+      color: rgba(255,255,255,0.72);
+      max-width: 580px;
+      margin: 0 auto 28px;
+      line-height: 1.65;
+    }
+    .hero-badges {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .sport-badge {
+      display: inline-block;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .badge-baseball { background:#002B5C; color:#fff; }
+    .badge-fastpitch { background:#7B1FA2; color:#fff; }
+    .badge-slowpitch { background:#1B5E20; color:#fff; }
+
+    /* MAIN CONTENT */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 48px 24px 64px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 32px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.04);
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--navy);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card h2 .icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(206,33,41,0.08);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .card p {
+      color: var(--text-light);
+      line-height: 1.7;
+      font-size: 0.97rem;
+    }
+
+    /* FEATURES GRID */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    .feature-card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid rgba(0,0,0,0.04);
+      text-align: center;
+    }
+    .feature-card .feat-icon {
+      font-size: 2rem;
+      margin-bottom: 12px;
+    }
+    .feature-card h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 0.88rem;
+      color: var(--text-light);
+      line-height: 1.6;
+    }
+
+    /* CTA */
+    .cta-card {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy3) 100%);
+      border-radius: 12px;
+      padding: 40px 32px;
+      text-align: center;
+      color: white;
+    }
+    .cta-card h2 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .cta-card p {
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 24px;
+      font-size: 0.97rem;
+    }
+    .btn-primary {
+      display: inline-block;
+      background: var(--red);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      padding: 13px 28px;
+      font-size: 1em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      text-decoration: none;
+      margin: 6px;
+    }
+    .btn-primary:hover { background: var(--red-dark); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(206,33,41,0.3); }
+    .btn-outline {
+      display: inline-block;
+      background: transparent;
+      color: white;
+      border: 2px solid rgba(255,255,255,0.35);
+      border-radius: 6px;
+      padding: 11px 28px;
+      font-size: 1em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: inherit;
+      text-decoration: none;
+      margin: 6px;
+    }
+    .btn-outline:hover { border-color: white; background: rgba(255,255,255,0.08); }
+
+    /* FOOTER */
+    footer {
+      text-align: center;
+      padding: 32px 24px;
+      color: var(--text-light);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border);
+    }
+    footer strong { color: var(--navy); }
+  </style>
+</head>
+<body>
+
+  <!-- GLOBAL NAV -->
+  <nav class="global-nav" id="globalNav">
+    <div class="global-nav-inner">
+      <a class="global-nav-logo" href="index.html">
+        <span class="gnav-usssa">USSSA</span><span class="gnav-aa">&nbsp;All-Access</span>
+      </a>
+      <div class="global-nav-links" id="gnavLinks">
+        <a href="index.html" class="gnav-link">Home</a>
+        <a href="player-of-the-week.html" class="gnav-link">Player of the Week</a>
+        <a href="hall-of-fame.html" class="gnav-link gnav-hof">🏆 Hall of Fame</a>
+        <a href="field-reporter.html" class="gnav-link">Field Reporter</a>
+        <a href="index.html" class="gnav-link gnav-login">Staff Login</a>
+      </div>
+      <button class="gnav-hamburger" onclick="document.getElementById('gnavLinks').classList.toggle('open')">☰</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <p class="hero-eyebrow">About the Platform</p>
+    <h1>Welcome to <span>USSSA All-Access</span></h1>
+    <p>The official content hub celebrating the players, coaches, and communities that make USSSA sports great.</p>
+    <div class="hero-badges">
+      <span class="sport-badge badge-baseball">⚾ Baseball</span>
+      <span class="sport-badge badge-fastpitch">🥎 Fastpitch</span>
+      <span class="sport-badge badge-slowpitch">🏌️ Slowpitch</span>
+    </div>
+  </section>
+
+  <!-- MAIN -->
+  <div class="container">
+
+    <!-- WHAT IS THIS -->
+    <div class="card">
+      <h2><span class="icon">🎯</span> What is USSSA All-Access?</h2>
+      <p>USSSA All-Access is a dedicated content platform built to shine a spotlight on the athletes, families, and communities that make USSSA sports special. From Player of the Week awards to Field Reporter coverage, we go beyond the scoreboard to tell the stories that matter.</p>
+    </div>
+
+    <!-- FEATURES GRID -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feat-icon">🏅</div>
+        <h3>Player of the Week</h3>
+        <p>Each week we honor standout players across baseball, fastpitch, and slowpitch who lead with skill and character.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">🏆</div>
+        <h3>Hall of Fame</h3>
+        <p>A permanent showcase celebrating every player who has been recognized through the USSSA All-Access program.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon">📡</div>
+        <h3>Field Reporters</h3>
+        <p>Community members on the ground at tournaments, capturing the real moments from the field.</p>
+      </div>
+    </div>
+
+    <!-- MISSION -->
+    <div class="card">
+      <h2><span class="icon">💬</span> Our Mission</h2>
+      <p>Youth and amateur sports are about more than wins and losses. USSSA All-Access exists to recognize the players who show up with heart — the role models, the teammates, the kids who make their communities proud. We believe every great story deserves to be told.</p>
+    </div>
+
+    <!-- CTA -->
+    <div class="cta-card">
+      <h2>Be Part of the Story</h2>
+      <p>Know a player who deserves recognition? Nominate them for Player of the Week or apply to become a Field Reporter.</p>
+      <a href="player-of-the-week.html" class="btn-primary">Nominate a Player</a>
+      <a href="field-reporter.html" class="btn-outline">Become a Field Reporter</a>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <strong>USSSA All-Access</strong> &nbsp;·&nbsp; usssacontent.com &nbsp;·&nbsp; Celebrating the game and the people who play it.
+  </footer>
+
+</body>
+</html>
