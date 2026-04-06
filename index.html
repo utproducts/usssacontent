@@ -2483,6 +2483,7 @@ table tr:hover {
           <a class="sidebar-item" onclick="showDashboardPage('admin-ugc')"><span class="nav-icon">👤</span> User Content</a>
           <a class="sidebar-item" onclick="showDashboardPage('admin-spotlight')"><span class="nav-icon">🔦</span> The Spotlight</a>
           <a class="sidebar-item" onclick="showDashboardPage('admin-field-reporter')"><span class="nav-icon">📰</span> Field Reporter</a>
+          <a class="sidebar-item" onclick="showDashboardPage('admin-interns')"><span class="nav-icon">🎓</span> Intern Program</a>
         </div>
         <div class="sidebar-section">
           <div class="sidebar-section-title">Learn</div>
@@ -3137,6 +3138,28 @@ table tr:hover {
         <div class="card">
           <p style="color:var(--text-light); margin-bottom:16px;">These videos appear on the public landing page to show visitors what USSSA content looks like.</p>
           <div id="adminVideoSamplesList"></div>
+        </div>
+      </div>
+
+      <!-- ADMIN: INTERN PROGRAM -->
+      <div id="adminInterns" style="display:none;">
+        <div class="card-header" style="margin-bottom:20px;">
+          Intern Applications
+          <span id="internCount" style="font-size:0.75em; font-weight:500; color:var(--text-light);"></span>
+          <a href="/intern.html" target="_blank" class="btn btn-primary" style="width:180px; font-size:0.85em; text-decoration:none; text-align:center;">View Public Page</a>
+        </div>
+        <div class="card">
+          <div style="margin-bottom:12px; display:flex; gap:8px; align-items:center;">
+            <label style="font-size:0.85em; color:var(--text-light);">Filter:</label>
+            <select id="internFilter" onchange="renderInternApps()" style="font-size:0.85em; padding:4px 8px; border:1px solid var(--border); border-radius:4px;">
+              <option value="all">All</option>
+              <option value="new">New</option>
+              <option value="reviewing">Reviewing</option>
+              <option value="accepted">Accepted</option>
+              <option value="rejected">Rejected</option>
+            </select>
+          </div>
+          <div id="internAppsList"></div>
         </div>
       </div>
 
@@ -4331,6 +4354,7 @@ async function showDashboardPage(pageId) {
   if (pageId === 'admin-tutorials') renderTutorialsPage();
   if (pageId === 'admin-email') await initEmailPage();
   if (pageId === 'admin-directors') { allDirectors = []; allDirectorEvents = []; await renderDirectorsTable(); }
+  if (pageId === 'admin-interns') await renderInternApps();
   if (pageId === 'staff-file-manager') { /* renderStaffFileManager() */ }
   if (pageId === 'staff-publishing') { /* renderStaffPublishing() */ }
 }
@@ -9795,7 +9819,82 @@ function fallbackCopy(url, btn, onSuccess) {
   }
 }
 
+// ===== INTERN PROGRAM MANAGEMENT =====
+let internAppsCache = [];
 
+async function renderInternApps() {
+  const container = document.getElementById('internAppsList');
+  container.innerHTML = '<p style="color:var(--text-light);">Loading applications...</p>';
+
+  try {
+    const filter = document.getElementById('internFilter').value;
+    const resp = await fetch('/api/intern-applications?status=' + filter);
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.error);
+
+    internAppsCache = data.applications || [];
+    const count = internAppsCache.length;
+    document.getElementById('internCount').textContent = '(' + count + ' application' + (count !== 1 ? 's' : '') + ')';
+
+    if (count === 0) {
+      container.innerHTML = '<p style="color:var(--text-light); text-align:center; padding:40px 0;">No applications found.</p>';
+      return;
+    }
+
+    let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Socials</th><th>Resume</th><th>Status</th><th>Applied</th><th>Actions</th></tr></thead><tbody>';
+
+    internAppsCache.forEach(function(app) {
+      const statusColors = { 'new': '#3b82f6', 'reviewing': '#f59e0b', 'accepted': '#10b981', 'rejected': '#ef4444' };
+      const statusColor = statusColors[app.status] || '#94a3b8';
+      const socials = [];
+      if (app.instagram) socials.push('<a href="https://instagram.com/' + app.instagram.replace('@','') + '" target="_blank" style="color:var(--accent); text-decoration:none;">IG: ' + esc(app.instagram) + '</a>');
+      if (app.tiktok) socials.push('<a href="https://tiktok.com/@' + app.tiktok.replace('@','') + '" target="_blank" style="color:var(--accent); text-decoration:none;">TT: ' + esc(app.tiktok) + '</a>');
+
+      html += '<tr>' +
+        '<td style="font-weight:600;">' + esc(app.first_name) + ' ' + esc(app.last_name) + '</td>' +
+        '<td><a href="mailto:' + esc(app.email) + '" style="color:var(--accent); text-decoration:none;">' + esc(app.email) + '</a></td>' +
+        '<td>' + esc(app.phone || '—') + '</td>' +
+        '<td>' + (socials.length ? socials.join('<br>') : '—') + '</td>' +
+        '<td>' + (app.resume_link ? '<a href="' + esc(app.resume_link) + '" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600;">View</a>' : '—') + '</td>' +
+        '<td><span style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.8em; font-weight:600; background:' + statusColor + '22; color:' + statusColor + ';">' + esc(app.status) + '</span></td>' +
+        '<td style="font-size:0.85em; color:var(--text-light);">' + (app.created_at ? new Date(app.created_at).toLocaleDateString() : '—') + '</td>' +
+        '<td>' +
+          '<select onchange="updateInternStatus(' + app.id + ', this.value)" style="font-size:0.8em; padding:3px 6px; border:1px solid var(--border); border-radius:4px;">' +
+            '<option value="">Change...</option>' +
+            '<option value="new"' + (app.status==='new'?' selected':'') + '>New</option>' +
+            '<option value="reviewing"' + (app.status==='reviewing'?' selected':'') + '>Reviewing</option>' +
+            '<option value="accepted"' + (app.status==='accepted'?' selected':'') + '>Accepted</option>' +
+            '<option value="rejected"' + (app.status==='rejected'?' selected':'') + '>Rejected</option>' +
+          '</select>' +
+        '</td>' +
+      '</tr>';
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+  } catch (err) {
+    container.innerHTML = '<p style="color:#f87171;">Error loading applications: ' + (err.message || err) + '</p>';
+  }
+}
+
+async function updateInternStatus(id, status) {
+  if (!status) return;
+  try {
+    const resp = await fetch('/api/intern-application-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id, status: status })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      await renderInternApps();
+    } else {
+      alert('Error: ' + (data.error || 'Unknown error'));
+    }
+  } catch (err) {
+    alert('Failed to update status');
+  }
+}
 
 
 </script>
