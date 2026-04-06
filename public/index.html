@@ -9892,7 +9892,7 @@ async function renderPotwNominations() {
       return;
     }
 
-    let html = '';
+    let html = '<p style="color:var(--text-dim); font-size:13px; margin:0 0 12px 0;">Click any nomination to expand full details.</p>';
     potwCache.forEach(function(nom) {
       const statusColors = { 'new': '#3b82f6', 'reviewing': '#f59e0b', 'selected': '#8b5cf6', 'winner': '#10b981', 'declined': '#ef4444' };
       const statusColor = statusColors[nom.status] || '#94a3b8';
@@ -9900,37 +9900,60 @@ async function renderPotwNominations() {
         var labels = { 'role-model': '🏅 Role Model', 'unique': '⭐ Unique', 'teammate': '🤝 Teammate', 'community': '🌍 Community' };
         return labels[c] || c;
       }).join(', ') : '—';
+      const dateStr = nom.created_at ? new Date(nom.created_at).toLocaleDateString() : '';
 
-      html += '<div style="border:1px solid var(--border); border-radius:8px; padding:16px; margin-bottom:12px; background:var(--card-bg);">' +
-        '<div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">' +
-          '<div>' +
-            '<div style="font-size:1.1em; font-weight:700;">' + esc(nom.player_first) + ' ' + esc(nom.player_last) + '</div>' +
-            '<div style="font-size:0.85em; color:var(--text-light); margin-top:2px;">' +
-              esc(nom.team_name || '') + (nom.age_division ? ' · ' + esc(nom.age_division) : '') + (nom.position ? ' · ' + esc(nom.position) : '') + (nom.state ? ' · ' + esc(nom.state) : '') +
+      // Summary row (always visible, clickable)
+      html += '<div style="border:1px solid var(--border); border-radius:8px; margin-bottom:12px; background:var(--card-bg); overflow:hidden;">' +
+        '<div onclick="togglePotwDetail(' + nom.id + ')" style="display:flex; justify-content:space-between; align-items:center; padding:14px 16px; cursor:pointer; transition:background 0.15s;" onmouseenter="this.style.background=\'rgba(255,255,255,0.03)\'" onmouseleave="this.style.background=\'transparent\'">' +
+          '<div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0;">' +
+            '<span id="potwArrow' + nom.id + '" style="font-size:12px; color:var(--text-dim); transition:transform 0.2s;">&#9654;</span>' +
+            '<div style="flex:1; min-width:0;">' +
+              '<span style="font-weight:700;">' + esc(nom.player_first) + ' ' + esc(nom.player_last) + '</span>' +
+              '<span style="color:var(--text-dim); font-size:0.85em; margin-left:8px;">' +
+                esc(nom.team_name || '') + (nom.age_division ? ' · ' + esc(nom.age_division) : '') + (nom.state ? ' · ' + esc(nom.state) : '') +
+              '</span>' +
             '</div>' +
           '</div>' +
-          '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.8em; font-weight:600; background:' + statusColor + '22; color:' + statusColor + ';">' + esc(nom.status) + '</span>' +
+          '<div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">' +
+            '<span style="font-size:0.8em; color:var(--text-dim);">' + dateStr + '</span>' +
+            '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.8em; font-weight:600; background:' + statusColor + '22; color:' + statusColor + ';">' + esc(nom.status) + '</span>' +
+          '</div>' +
         '</div>' +
-        '<div style="margin-top:10px; font-size:0.9em; color:var(--text-light); line-height:1.6;">' +
-          '<strong>Why nominated:</strong> ' + esc(nom.reason).substring(0, 300) + (nom.reason.length > 300 ? '... <a href="#" onclick="this.parentElement.innerHTML=\'<strong>Why nominated:</strong> \' + potwCache.find(n=>n.id===' + nom.id + ').reason; return false;" style="color:var(--accent);">Read more</a>' : '') +
-        '</div>' +
-        '<div style="margin-top:8px; font-size:0.85em; color:var(--text-light);">' +
-          '<strong>Criteria:</strong> ' + criteria +
-        '</div>' +
-        '<div style="margin-top:8px; font-size:0.85em; color:var(--text-light);">' +
-          '<strong>Nominated by:</strong> ' + esc(nom.nominator_name) + ' (' + esc(nom.relationship || '—') + ') · <a href="mailto:' + esc(nom.nominator_email) + '" style="color:var(--accent); text-decoration:none;">' + esc(nom.nominator_email) + '</a>' +
-        '</div>' +
-        (nom.media_link ? '<div style="margin-top:6px; font-size:0.85em;"><a href="' + esc(nom.media_link) + '" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600;">📎 View Media</a></div>' : '') +
-        '<div style="margin-top:10px; display:flex; gap:8px; align-items:center; flex-wrap:wrap;">' +
-          '<select onchange="updatePotwStatus(' + nom.id + ', this.value)" style="font-size:0.8em; padding:4px 8px; border:1px solid var(--border); border-radius:4px;">' +
-            '<option value="">Change status...</option>' +
-            '<option value="new"' + (nom.status==='new'?' selected':'') + '>New</option>' +
-            '<option value="reviewing"' + (nom.status==='reviewing'?' selected':'') + '>Reviewing</option>' +
-            '<option value="selected"' + (nom.status==='selected'?' selected':'') + '>Selected</option>' +
-            '<option value="winner"' + (nom.status==='winner'?' selected':'') + '>Winner</option>' +
-            '<option value="declined"' + (nom.status==='declined'?' selected':'') + '>Declined</option>' +
-          '</select>' +
-          '<span style="font-size:0.8em; color:var(--text-light);">' + (nom.created_at ? new Date(nom.created_at).toLocaleDateString() : '') + '</span>' +
+
+        // Expanded details (hidden by default)
+        '<div id="potwDetail' + nom.id + '" style="display:none; padding:0 16px 16px; border-top:1px solid var(--border);">' +
+          '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px 24px; margin-top:14px; font-size:0.9em;">' +
+            '<div><span style="color:var(--text-dim); font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Player Name</span><div style="margin-top:2px; font-weight:600;">' + esc(nom.player_first) + ' ' + esc(nom.player_last) + '</div></div>' +
+            '<div><span style="color:var(--text-dim); font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Team</span><div style="margin-top:2px; font-weight:600;">' + esc(nom.team_name || '—') + '</div></div>' +
+            '<div><span style="color:var(--text-dim); font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Age Division</span><div style="margin-top:2px;">' + esc(nom.age_division || '—') + '</div></div>' +
+            '<div><span style="color:var(--text-dim); font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Position</span><div style="margin-top:2px;">' + esc(nom.position || '—') + '</div></div>' +
+            '<div><span style="color:var(--text-dim); font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">State</span><div style="margin-top:2px;">' + esc(nom.state || '—') + '</div></div>' +
+            '<div><span style="color:var(--text-dim); font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Criteria</span><div style="margin-top:2px;">' + criteria + '</div></div>' +
+          '</div>' +
+
+          '<div style="margin-top:16px; font-size:0.9em;">' +
+            '<span style="color:var(--text-dim); font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Why This Player Deserves Recognition</span>' +
+            '<div style="margin-top:6px; line-height:1.7; color:var(--text-light); background:rgba(0,0,0,0.15); padding:12px 14px; border-radius:6px; white-space:pre-wrap;">' + esc(nom.reason) + '</div>' +
+          '</div>' +
+
+          '<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px 24px; margin-top:16px; font-size:0.9em; padding-top:14px; border-top:1px solid var(--border);">' +
+            '<div><span style="color:var(--text-dim); font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Nominated By</span><div style="margin-top:2px; font-weight:600;">' + esc(nom.nominator_name) + '</div></div>' +
+            '<div><span style="color:var(--text-dim); font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Relationship</span><div style="margin-top:2px;">' + esc(nom.relationship || '—') + '</div></div>' +
+            '<div><span style="color:var(--text-dim); font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Email</span><div style="margin-top:2px;"><a href="mailto:' + esc(nom.nominator_email) + '" style="color:var(--accent); text-decoration:none;">' + esc(nom.nominator_email) + '</a></div></div>' +
+            '<div><span style="color:var(--text-dim); font-size:0.85em; text-transform:uppercase; letter-spacing:0.5px;">Media Link</span><div style="margin-top:2px;">' + (nom.media_link ? '<a href="' + esc(nom.media_link) + '" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600;">View Media</a>' : '—') + '</div></div>' +
+          '</div>' +
+
+          '<div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border); display:flex; gap:12px; align-items:center; flex-wrap:wrap;">' +
+            '<label style="font-size:0.85em; color:var(--text-dim);">Status:</label>' +
+            '<select onchange="updatePotwStatus(' + nom.id + ', this.value)" style="font-size:0.85em; padding:5px 10px; border:1px solid var(--border); border-radius:4px;">' +
+              '<option value="new"' + (nom.status==='new'?' selected':'') + '>New</option>' +
+              '<option value="reviewing"' + (nom.status==='reviewing'?' selected':'') + '>Reviewing</option>' +
+              '<option value="selected"' + (nom.status==='selected'?' selected':'') + '>Selected</option>' +
+              '<option value="winner"' + (nom.status==='winner'?' selected':'') + '>Winner</option>' +
+              '<option value="declined"' + (nom.status==='declined'?' selected':'') + '>Declined</option>' +
+            '</select>' +
+            '<span style="font-size:0.8em; color:var(--text-dim);">Submitted: ' + dateStr + '</span>' +
+          '</div>' +
         '</div>' +
       '</div>';
     });
@@ -9938,6 +9961,18 @@ async function renderPotwNominations() {
     container.innerHTML = html;
   } catch (err) {
     container.innerHTML = '<p style="color:#f87171;">Error loading nominations: ' + (err.message || err) + '</p>';
+  }
+}
+
+function togglePotwDetail(id) {
+  const detail = document.getElementById('potwDetail' + id);
+  const arrow = document.getElementById('potwArrow' + id);
+  if (detail.style.display === 'none') {
+    detail.style.display = 'block';
+    arrow.style.transform = 'rotate(90deg)';
+  } else {
+    detail.style.display = 'none';
+    arrow.style.transform = 'rotate(0deg)';
   }
 }
 
