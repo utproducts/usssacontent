@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Letter They'll Never Forget | USSSA Content Creator Club</title>
+<style>
+:root {
+  --navy: #001f5b;
+  --navy-deep: #0a1628;
+  --navy2: #111d32;
+  --navy3: #1a2744;
+  --blue: #123a86;
+  --blue-light: #1a4aa5;
+  --red: #CE2129;
+  --red-dark: #a81b22;
+  --red-glow: rgba(206,33,41,0.25);
+  --gold: #d4a853;
+  --gold-glow: rgba(212,168,83,0.2);
+  --white: #ffffff;
+  --light: #f1f3f8;
+  --text: #f1f3f8;
+  --text-light: #b8c5d8;
+  --text-dim: #6b7f99;
+  --border-dark: rgba(255,255,255,0.08);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,0.3);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--navy-deep); color:var(--text); min-height:100vh; position:relative; }
+body::before { content:''; position:fixed; top:0; left:0; right:0; bottom:0; background:url('img/letter-bg.png') center top / 75% auto no-repeat; opacity:0.4; z-index:0; pointer-events:none; }
+body::after { content:''; position:fixed; top:0; left:0; right:0; bottom:0; background:linear-gradient(180deg, transparent 0%, rgba(10,22,40,0.3) 35%, rgba(10,22,40,0.7) 65%, rgba(10,22,40,0.9) 85%); z-index:0; pointer-events:none; }
+
+/* HEADER */
+.site-header { background:rgba(10,22,40,0.95); border-bottom:1px solid var(--border-dark); padding:16px 0; position:sticky; top:0; z-index:100; backdrop-filter:blur(12px); position:relative; z-index:100; }
+.header-inner { max-width:1100px; margin:0 auto; padding:0 24px; display:flex; align-items:center; justify-content:space-between; }
+.logo { font-size:22px; font-weight:800; letter-spacing:-0.5px; }
+.logo span:first-child { color:var(--white); }
+.logo span:last-child { color:var(--red); }
+.header-link { color:var(--text-light); text-decoration:none; font-size:14px; font-weight:500; transition:color 0.2s; }
+.header-link:hover { color:var(--white); }
+
+/* HERO */
+.hero { padding:80px 24px 70px; text-align:center; position:relative; overflow:hidden; z-index:1; }
+.hero::before { content:''; position:absolute; top:0; left:0; right:0; bottom:0; background:radial-gradient(ellipse at 50% 120%, rgba(212,168,83,0.12) 0%, transparent 60%); pointer-events:none; z-index:0; }
+.hero::after { content:''; position:absolute; bottom:0; left:0; right:0; height:120px; background:linear-gradient(to top, rgba(10,22,40,0.8), transparent); pointer-events:none; z-index:0; }
+.hero-content { position:relative; z-index:1; max-width:750px; margin:0 auto; }
+.hero-eyebrow { display:inline-block; color:var(--gold); font-size:12px; font-weight:700; letter-spacing:2px; text-transform:uppercase; margin-bottom:18px; }
+.hero h1 { font-size:clamp(34px,5.5vw,56px); font-weight:800; line-height:1.08; margin-bottom:18px; letter-spacing:-1.5px; color:var(--white); }
+.hero h1 em { font-style:normal; color:var(--gold); }
+.hero-sub { font-size:19px; color:rgba(237,243,255,0.85); line-height:1.65; max-width:600px; margin:0 auto; }
+
+/* QUOTE SECTION */
+.quote-section { padding:60px 24px; text-align:center; position:relative; }
+.quote-block { max-width:680px; margin:0 auto; position:relative; padding:0 20px; }
+.quote-block::before { content:'\201C'; position:absolute; top:-30px; left:-10px; font-size:120px; color:rgba(212,168,83,0.15); font-family:Georgia,serif; line-height:1; }
+.quote-text { font-size:clamp(20px,3vw,26px); font-style:italic; color:var(--white); line-height:1.6; font-weight:300; letter-spacing:-0.3px; }
+.quote-attr { margin-top:16px; font-size:14px; color:var(--gold); font-weight:600; letter-spacing:1px; text-transform:uppercase; }
+
+/* MAIN */
+.main { max-width:1100px; margin:0 auto; padding:20px 24px 60px; position:relative; z-index:1; }
+
+/* STORY SECTION */
+.story-section { max-width:720px; margin:0 auto 50px; }
+.story-section p { font-size:17px; line-height:1.8; color:var(--text-light); margin-bottom:18px; }
+.story-section p strong { color:var(--white); }
+
+/* CRITERIA CARDS */
+.criteria-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; margin:50px auto; max-width:920px; }
+.criteria-card { background:var(--navy2); border:1px solid var(--border-dark); border-radius:var(--radius); padding:28px; position:relative; overflow:hidden; transition:transform 0.2s, box-shadow 0.2s; }
+.criteria-card:hover { transform:translateY(-3px); box-shadow:var(--shadow-lg); }
+.criteria-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, var(--gold), var(--red)); }
+.criteria-card .card-icon { font-size:28px; margin-bottom:12px; }
+.criteria-card h3 { font-size:17px; font-weight:700; color:var(--white); margin-bottom:8px; }
+.criteria-card p { font-size:14px; line-height:1.7; color:var(--text-light); }
+
+/* SELECTED STORIES CALLOUT */
+.callout { max-width:720px; margin:40px auto; background:linear-gradient(135deg, rgba(212,168,83,0.08), rgba(206,33,41,0.05)); border:1px solid rgba(212,168,83,0.2); border-radius:var(--radius); padding:28px 32px; text-align:center; }
+.callout p { font-size:16px; line-height:1.7; color:var(--text-light); }
+.callout strong { color:var(--gold); }
+
+/* URGENCY BAR */
+.urgency { max-width:720px; margin:0 auto 50px; background:rgba(206,33,41,0.08); border:1px solid rgba(206,33,41,0.2); border-radius:var(--radius-sm); padding:14px 20px; text-align:center; font-size:14px; color:#f87171; font-weight:600; }
+
+/* FORM */
+.form-section { background:var(--navy2); border:1px solid var(--border-dark); border-radius:var(--radius); padding:44px; max-width:720px; margin:0 auto; }
+.form-section h2 { font-size:28px; font-weight:800; text-align:center; margin-bottom:4px; letter-spacing:-0.5px; }
+.form-section .form-sub { font-size:14px; color:var(--text-light); text-align:center; margin-bottom:32px; }
+
+.form-row { display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px; }
+@media (max-width:520px) { .form-row { grid-template-columns:1fr; } }
+
+.form-group { margin-bottom:16px; }
+.form-group label { display:block; font-size:13px; font-weight:600; color:var(--text-light); margin-bottom:6px; text-transform:uppercase; letter-spacing:0.5px; }
+.form-group label .req { color:var(--red); }
+.form-group input, .form-group textarea, .form-group select { width:100%; padding:12px 16px; background:var(--navy3); border:1px solid var(--border-dark); border-radius:var(--radius-sm); color:var(--white); font-size:15px; font-family:inherit; transition:border-color 0.2s, box-shadow 0.2s; outline:none; }
+.form-group textarea { min-height:140px; resize:vertical; line-height:1.6; }
+.form-group input::placeholder, .form-group textarea::placeholder { color:var(--text-dim); }
+.form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color:var(--gold); box-shadow:0 0 0 3px var(--gold-glow); }
+.form-group .hint { font-size:12px; color:var(--text-dim); margin-top:4px; line-height:1.5; }
+.form-group select { appearance:auto; }
+.form-group select option { background:var(--navy3); color:var(--white); }
+
+.submit-btn { width:100%; padding:15px; background:linear-gradient(135deg, var(--red), var(--red-dark)); color:var(--white); border:none; border-radius:var(--radius-sm); font-size:16px; font-weight:700; cursor:pointer; transition:opacity 0.2s, transform 0.1s; margin-top:12px; text-transform:uppercase; letter-spacing:1px; }
+.submit-btn:hover { opacity:0.92; transform:translateY(-1px); }
+.submit-btn:active { transform:translateY(0); }
+.submit-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+/* SUCCESS */
+.success-msg { display:none; text-align:center; padding:48px 20px; }
+.success-msg .heart { font-size:56px; margin-bottom:20px; }
+.success-msg h3 { font-size:24px; font-weight:700; margin-bottom:10px; color:var(--white); }
+.success-msg p { font-size:16px; color:var(--text-light); line-height:1.7; max-width:440px; margin:0 auto; }
+
+/* ERROR */
+.error-msg { background:rgba(206,33,41,0.1); border:1px solid rgba(206,33,41,0.3); color:#f87171; padding:12px 16px; border-radius:var(--radius-sm); font-size:14px; margin-bottom:16px; display:none; }
+
+/* FOOTER */
+.site-footer { border-top:1px solid var(--border-dark); padding:32px 24px; text-align:center; margin-top:40px; position:relative; z-index:1; }
+.site-footer p { font-size:13px; color:var(--text-dim); }
+
+/* SCROLL BTN */
+.scroll-btn { display:inline-block; margin-top:28px; padding:14px 36px; background:linear-gradient(135deg, var(--red), var(--red-dark)); color:var(--white); text-decoration:none; border-radius:var(--radius-sm); font-weight:700; font-size:15px; transition:opacity 0.2s, transform 0.1s; letter-spacing:0.5px; position:relative; z-index:2; }
+.scroll-btn:hover { opacity:0.92; transform:translateY(-1px); }
+
+/* SECTION DIVIDER */
+.divider { width:60px; height:3px; background:linear-gradient(90deg, var(--gold), var(--red)); margin:0 auto 40px; border-radius:2px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="logo"><span>USSSA </span><span>Content Creator Club</span></div>
+    <a href="/" class="header-link">&larr; Back to USSSA All-Access</a>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <div class="hero-eyebrow">A USSSA Storytelling Series</div>
+    <h1>A Letter They'll <em>Never Forget</em></h1>
+    <p class="hero-sub">Behind every athlete is someone who believed first. We're honoring those people — one letter at a time.</p>
+    <a href="#submit" class="scroll-btn">Share Your Story</a>
+  </div>
+</section>
+
+<!-- QUOTE -->
+<section class="quote-section">
+  <div class="quote-block">
+    <p class="quote-text">What would an athlete say if they had the chance to read a letter, out loud, to the person who changed everything?</p>
+  </div>
+</section>
+
+<!-- MAIN -->
+<main class="main">
+
+  <div class="divider"></div>
+
+  <!-- STORY INTRO -->
+  <div class="story-section">
+    <p>Some of the most meaningful moments in sports never happen under the lights. They happen in the early mornings, in the long drives home, in the encouragement after disappointment, and in the steady support that helps an athlete keep going.</p>
+    <p><strong>A Letter They'll Never Forget</strong> is a new USSSA storytelling series created to honor the people behind the journey. We're inviting athletes to submit a personal story and a letter to someone who shaped their path — a parent, coach, grandparent, sibling, teammate, mentor, or even their younger self.</p>
+    <p>We are starting in <strong>Texas</strong>, and we want these first stories to reflect the heart, family values, and emotional depth that define so many journeys in your community.</p>
+  </div>
+
+  <!-- CRITERIA -->
+  <div class="criteria-grid">
+    <div class="criteria-card">
+      <div class="card-icon">&#128156;</div>
+      <h3>A Real Relationship</h3>
+      <p>Tell us about someone who changed the athlete's life or perspective — on or off the field.</p>
+    </div>
+    <div class="criteria-card">
+      <div class="card-icon">&#127942;</div>
+      <h3>A Story That Matters</h3>
+      <p>Rooted in gratitude, sacrifice, resilience, growth, or belief. The kind of story that gives people chills.</p>
+    </div>
+    <div class="criteria-card">
+      <div class="card-icon">&#127775;</div>
+      <h3>Beyond the Scoreboard</h3>
+      <p>A message that reminds people why sports matter far beyond wins and losses.</p>
+    </div>
+  </div>
+
+  <!-- CALLOUT -->
+  <div class="callout">
+    <p><strong>Selected stories will be professionally filmed and featured across official USSSA platforms,</strong> giving athletes and families the opportunity to be part of a powerful series designed to inspire others nationwide.</p>
+  </div>
+
+  <!-- URGENCY -->
+  <div class="urgency">
+    Our first round of featured stories is now being considered. Once those spots are filled, this initial Texas launch window will close.
+  </div>
+
+  <!-- SUBMISSION FORM -->
+  <div class="form-section" id="submit">
+    <h2>Share Your Story</h2>
+    <p class="form-sub">Tell us about the person and the moment. We'll take it from there.</p>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <form id="letterForm" onsubmit="return submitLetter(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Athlete's First Name <span class="req">*</span></label>
+          <input type="text" id="athleteFirst" placeholder="First name" required>
+        </div>
+        <div class="form-group">
+          <label>Athlete's Last Name <span class="req">*</span></label>
+          <input type="text" id="athleteLast" placeholder="Last name" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Athlete's Age <span class="req">*</span></label>
+          <input type="number" id="athleteAge" placeholder="Age" min="5" max="99" required>
+        </div>
+        <div class="form-group">
+          <label>Sport <span class="req">*</span></label>
+          <input type="text" id="sport" placeholder="e.g. Baseball, Softball, Basketball" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>City / Area in Texas <span class="req">*</span></label>
+        <input type="text" id="city" placeholder="e.g. Houston, Dallas, San Antonio" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Contact Email <span class="req">*</span></label>
+          <input type="email" id="email" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+          <label>Contact Phone</label>
+          <input type="tel" id="phone" placeholder="(555) 123-4567">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Who is the letter to? <span class="req">*</span></label>
+        <input type="text" id="letterTo" placeholder="e.g. My dad, Coach Williams, My older brother" required>
+        <div class="hint">The person who shaped the athlete's journey.</div>
+      </div>
+
+      <div class="form-group">
+        <label>Relationship to the Athlete <span class="req">*</span></label>
+        <select id="relationship" required>
+          <option value="">Select...</option>
+          <option value="Parent">Parent</option>
+          <option value="Grandparent">Grandparent</option>
+          <option value="Coach">Coach</option>
+          <option value="Sibling">Sibling</option>
+          <option value="Teammate">Teammate</option>
+          <option value="Mentor">Mentor</option>
+          <option value="Self">Their Younger Self</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Tell Us Your Story <span class="req">*</span></label>
+        <textarea id="story" placeholder="What happened? Why does this person matter? What would the athlete say to them if they had the chance? Share as much as you'd like — the more detail, the better." required></textarea>
+        <div class="hint">This is the heart of your submission. Don't hold back — the real, raw stories are the ones that move people.</div>
+      </div>
+
+      <div class="form-group">
+        <label>Video or Social Link (Optional)</label>
+        <input type="url" id="videoLink" placeholder="https://instagram.com/... or TikTok, YouTube, etc.">
+        <div class="hint">Have a video clip, Instagram reel, or social post that shows the relationship? Drop the link here.</div>
+      </div>
+
+      <div class="form-group">
+        <label>Who is submitting this? <span class="req">*</span></label>
+        <select id="submitter" required>
+          <option value="">Select...</option>
+          <option value="The athlete">The athlete themselves</option>
+          <option value="A parent/guardian">A parent or guardian</option>
+          <option value="A family member">Another family member</option>
+          <option value="A coach">A coach</option>
+          <option value="A friend/teammate">A friend or teammate</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">Submit Your Story</button>
+    </form>
+
+    <div class="success-msg" id="successMsg">
+      <div class="heart">&#128156;</div>
+      <h3>Your Story Has Been Received</h3>
+      <p>Thank you for sharing something so personal. Our team will review every submission with care. If your story is selected, we'll be in touch to bring it to life on film.</p>
+    </div>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <p>&copy; 2026 USSSA Content Creator Club. All rights reserved.</p>
+</footer>
+
+<script>
+async function submitLetter(e) {
+  e.preventDefault();
+  var btn = document.getElementById('submitBtn');
+  var errEl = document.getElementById('errorMsg');
+  errEl.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  var data = {
+    athlete_first: document.getElementById('athleteFirst').value.trim(),
+    athlete_last: document.getElementById('athleteLast').value.trim(),
+    athlete_age: document.getElementById('athleteAge').value.trim(),
+    sport: document.getElementById('sport').value.trim(),
+    city: document.getElementById('city').value.trim(),
+    email: document.getElementById('email').value.trim(),
+    phone: document.getElementById('phone').value.trim(),
+    letter_to: document.getElementById('letterTo').value.trim(),
+    relationship: document.getElementById('relationship').value,
+    story: document.getElementById('story').value.trim(),
+    video_link: document.getElementById('videoLink').value.trim(),
+    submitter: document.getElementById('submitter').value
+  };
+
+  if (!data.athlete_first || !data.athlete_last || !data.athlete_age || !data.sport || !data.city || !data.email || !data.letter_to || !data.relationship || !data.story || !data.submitter) {
+    errEl.textContent = 'Please fill in all required fields.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Submit Your Story';
+    return false;
+  }
+
+  try {
+    var resp = await fetch('/api/letter-submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
+    });
+    var result = await resp.json();
+    if (result.success) {
+      document.getElementById('letterForm').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+      document.querySelector('.form-sub').style.display = 'none';
+      errEl.style.display = 'none';
+    } else {
+      throw new Error(result.error || 'Something went wrong');
+    }
+  } catch (err) {
+    errEl.textContent = err.message || 'Failed to submit. Please try again.';
+    errEl.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Submit Your Story';
+  }
+  return false;
+}
+</script>
+
+</body>
+</html>
