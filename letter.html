@@ -30,7 +30,7 @@
 
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--navy-deep); color:var(--text); min-height:100vh; position:relative; }
-body::before { content:''; position:fixed; top:0; left:0; right:0; bottom:0; background:url('img/letter-bg.png') center top / cover no-repeat; opacity:0.35; z-index:0; pointer-events:none; }
+body::before { content:''; position:fixed; top:0; left:0; right:0; bottom:0; background:url('img/letter-bg.png') center top / contain no-repeat; opacity:0.35; z-index:0; pointer-events:none; }
 body::after { content:''; position:fixed; top:0; left:0; right:0; bottom:0; background:linear-gradient(180deg, transparent 0%, rgba(10,22,40,0.3) 35%, rgba(10,22,40,0.7) 65%, rgba(10,22,40,0.9) 85%); z-index:0; pointer-events:none; }
 
 /* HEADER */
