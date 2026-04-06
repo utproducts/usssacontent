@@ -2484,6 +2484,7 @@ table tr:hover {
           <a class="sidebar-item" onclick="showDashboardPage('admin-spotlight')"><span class="nav-icon">🔦</span> The Spotlight</a>
           <a class="sidebar-item" onclick="showDashboardPage('admin-field-reporter')"><span class="nav-icon">📰</span> Field Reporter</a>
           <a class="sidebar-item" onclick="showDashboardPage('admin-interns')"><span class="nav-icon">🎓</span> Intern Program</a>
+          <a class="sidebar-item" onclick="showDashboardPage('admin-letters')"><span class="nav-icon">💌</span> Letters</a>
         </div>
         <div class="sidebar-section">
           <div class="sidebar-section-title">Learn</div>
@@ -3160,6 +3161,30 @@ table tr:hover {
             </select>
           </div>
           <div id="internAppsList"></div>
+        </div>
+      </div>
+
+      <!-- ADMIN: LETTERS THEY'LL NEVER FORGET -->
+      <div id="adminLetters" style="display:none;">
+        <div class="card-header" style="margin-bottom:20px;">
+          A Letter They'll Never Forget
+          <span id="letterCount" style="font-size:0.75em; font-weight:500; color:var(--text-light);"></span>
+          <a href="/letter" target="_blank" class="btn btn-primary" style="width:180px; font-size:0.85em; text-decoration:none; text-align:center;">View Public Page</a>
+        </div>
+        <div class="card">
+          <div style="margin-bottom:12px; display:flex; gap:8px; align-items:center;">
+            <label style="font-size:0.85em; color:var(--text-light);">Filter:</label>
+            <select id="letterFilter" onchange="renderLetterSubmissions()" style="font-size:0.85em; padding:4px 8px; border:1px solid var(--border); border-radius:4px;">
+              <option value="all">All</option>
+              <option value="new">New</option>
+              <option value="reviewing">Reviewing</option>
+              <option value="selected">Selected</option>
+              <option value="filmed">Filmed</option>
+              <option value="published">Published</option>
+              <option value="declined">Declined</option>
+            </select>
+          </div>
+          <div id="letterSubmissionsList"></div>
         </div>
       </div>
 
@@ -4355,6 +4380,7 @@ async function showDashboardPage(pageId) {
   if (pageId === 'admin-email') await initEmailPage();
   if (pageId === 'admin-directors') { allDirectors = []; allDirectorEvents = []; await renderDirectorsTable(); }
   if (pageId === 'admin-interns') await renderInternApps();
+  if (pageId === 'admin-letters') await renderLetterSubmissions();
   if (pageId === 'staff-file-manager') { /* renderStaffFileManager() */ }
   if (pageId === 'staff-publishing') { /* renderStaffPublishing() */ }
 }
@@ -9874,6 +9900,94 @@ async function renderInternApps() {
     container.innerHTML = html;
   } catch (err) {
     container.innerHTML = '<p style="color:#f87171;">Error loading applications: ' + (err.message || err) + '</p>';
+  }
+}
+
+// ===== LETTER SUBMISSIONS MANAGEMENT =====
+let letterCache = [];
+
+async function renderLetterSubmissions() {
+  const container = document.getElementById('letterSubmissionsList');
+  container.innerHTML = '<p style="color:var(--text-light);">Loading submissions...</p>';
+
+  try {
+    const filter = document.getElementById('letterFilter').value;
+    const resp = await fetch('/api/letter-submissions?status=' + filter);
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.error);
+
+    letterCache = data.submissions || [];
+    const count = letterCache.length;
+    document.getElementById('letterCount').textContent = '(' + count + ' submission' + (count !== 1 ? 's' : '') + ')';
+
+    if (count === 0) {
+      container.innerHTML = '<p style="color:var(--text-light); text-align:center; padding:40px 0;">No submissions found.</p>';
+      return;
+    }
+
+    let html = '';
+    letterCache.forEach(function(sub) {
+      const statusColors = { 'new': '#3b82f6', 'reviewing': '#f59e0b', 'selected': '#10b981', 'filmed': '#8b5cf6', 'published': '#06b6d4', 'declined': '#ef4444' };
+      const sc = statusColors[sub.status] || '#94a3b8';
+      const storyPreview = sub.story && sub.story.length > 200 ? sub.story.substring(0, 200) + '...' : (sub.story || '');
+
+      html += '<div style="background:var(--light); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:16px;">' +
+        '<div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px; margin-bottom:12px;">' +
+          '<div>' +
+            '<div style="font-size:1.1em; font-weight:700; color:var(--text);">💌 Letter to: ' + esc(sub.letter_to) + ' <span style="font-weight:400; color:var(--text-light); font-size:0.85em;">(' + esc(sub.relationship || '—') + ')</span></div>' +
+            '<div style="font-size:0.9em; color:var(--text-light); margin-top:4px;">From: <strong style="color:var(--text);">' + esc(sub.athlete_first) + ' ' + esc(sub.athlete_last) + '</strong>' +
+              (sub.athlete_age ? ', age ' + sub.athlete_age : '') +
+              (sub.sport ? ' &bull; ' + esc(sub.sport) : '') +
+              (sub.city ? ' &bull; ' + esc(sub.city) + ', TX' : '') +
+            '</div>' +
+          '</div>' +
+          '<div style="display:flex; gap:8px; align-items:center;">' +
+            '<span style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:0.8em; font-weight:600; background:' + sc + '22; color:' + sc + ';">' + esc(sub.status) + '</span>' +
+            '<span style="font-size:0.8em; color:var(--text-light);">' + (sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '') + '</span>' +
+          '</div>' +
+        '</div>' +
+        '<div id="letter-story-' + sub.id + '" style="font-size:0.9em; color:var(--text-light); line-height:1.7; margin-bottom:10px; max-height:80px; overflow:hidden; transition:max-height 0.3s ease;">' + esc(sub.story || '') + '</div>' +
+        (sub.story && sub.story.length > 200 ? '<button onclick="(function(){ var el=document.getElementById(\'letter-story-' + sub.id + '\'); if(el.style.maxHeight===\'80px\'){el.style.maxHeight=\'none\';el.style.overflow=\'visible\';this.textContent=\'Hide story\'}else{el.style.maxHeight=\'80px\';el.style.overflow=\'hidden\';this.textContent=\'Read full story\'}}).call(this)" style="background:none; border:none; color:var(--accent); font-size:0.8em; cursor:pointer; padding:0; font-weight:600; margin-bottom:10px;">Read full story</button>' : '') +
+        '<div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; font-size:0.85em;">' +
+          '<a href="mailto:' + esc(sub.email) + '" style="color:var(--accent); text-decoration:none;">' + esc(sub.email) + '</a>' +
+          (sub.phone ? '<span style="color:var(--text-light);">' + esc(sub.phone) + '</span>' : '') +
+          (sub.video_link ? '<a href="' + esc(sub.video_link) + '" target="_blank" style="color:var(--accent); text-decoration:none; font-weight:600;">🎥 Video Link</a>' : '') +
+          '<span style="color:var(--text-dim);">Submitted by: ' + esc(sub.submitter || '—') + '</span>' +
+          '<select onchange="updateLetterStatus(' + sub.id + ', this.value)" style="font-size:0.9em; padding:3px 6px; border:1px solid var(--border); border-radius:4px; margin-left:auto;">' +
+            '<option value="">Change status...</option>' +
+            '<option value="new">New</option>' +
+            '<option value="reviewing">Reviewing</option>' +
+            '<option value="selected">Selected</option>' +
+            '<option value="filmed">Filmed</option>' +
+            '<option value="published">Published</option>' +
+            '<option value="declined">Declined</option>' +
+          '</select>' +
+        '</div>' +
+      '</div>';
+    });
+
+    container.innerHTML = html;
+  } catch (err) {
+    container.innerHTML = '<p style="color:#f87171;">Error loading submissions: ' + (err.message || err) + '</p>';
+  }
+}
+
+async function updateLetterStatus(id, status) {
+  if (!status) return;
+  try {
+    const resp = await fetch('/api/letter-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id, status: status })
+    });
+    const data = await resp.json();
+    if (data.success) {
+      await renderLetterSubmissions();
+    } else {
+      alert('Error: ' + (data.error || 'Unknown error'));
+    }
+  } catch (err) {
+    alert('Failed to update status');
   }
 }
 
