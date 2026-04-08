@@ -8734,7 +8734,8 @@ function buildShotListPDF(ev, types, eventId) {
   function drawBlock(y, ct, qty) {
     var numSlots = qty || 5;
     var code = getContentTypeCode(ct.id, ct.name);
-    var tip = ct.tip || ct.description || ct.desc || '';
+    var desc = ct.description || ct.desc || '';
+    var tip = ct.tip || '';
     var refUrl = ct.reference_url || '';
     var hasQR = !!refUrl;
     var qrSz = hasQR ? 46 : 0;
@@ -8742,9 +8743,10 @@ function buildShotListPDF(ev, types, eventId) {
     // Calculate total height
     var introH = ct.intro_script ? 18 + doc.splitTextToSize(ct.intro_script, USABLE - 30).length * 11 + 4 : 0;
     var closingH = ct.closing_script ? 18 + doc.splitTextToSize(ct.closing_script, USABLE - 30).length * 11 + 4 : 0;
+    var descH = desc ? 20 : 0;
     var tipH = (tip || hasQR) ? Math.max(20, hasQR ? qrSz + 10 : 20) : 0;
     var tableH = 16 + (numSlots * 18);
-    var totalH = introH + 24 + tipH + tableH + closingH + 10;
+    var totalH = introH + 24 + descH + tipH + tableH + closingH + 10;
 
     if (y + Math.min(totalH, 120) > H - 40) y = newPage();
 
@@ -8768,6 +8770,21 @@ function buildShotListPDF(ev, types, eventId) {
     doc.setTextColor(255, 255, 255); doc.setFontSize(7);
     doc.text(codeLabel, RIGHT - clW / 2 - 6, y + 14, { align: 'center' });
     y += 24;
+
+    // ── Description row ──
+    if (desc) {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5);
+      var descLines = doc.splitTextToSize(desc, USABLE - 20);
+      var descRowH = 10 + (descLines.length * 10);
+      if (y + descRowH > H - 40) y = newPage();
+      doc.setFillColor(240, 245, 255);
+      doc.rect(M, y, USABLE, descRowH, 'F');
+      doc.setTextColor(50, 60, 80);
+      for (var dl = 0; dl < descLines.length; dl++) {
+        doc.text(descLines[dl], M + 8, y + 10 + (dl * 10));
+      }
+      y += descRowH;
+    }
 
     // ── Tip + QR row ──
     if (tip || hasQR) {
